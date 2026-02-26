@@ -1,0 +1,24 @@
+name: Record New Order
+
+on:
+  repository_dispatch:
+    types: [new_order]
+
+jobs:
+  save_order:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Save order
+        run: |
+          mkdir -p orders
+          TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+          echo "${{ github.event.client_payload }}" > orders/order-$TIMESTAMP.json
+      - name: Commit & Push
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add orders/*.json
+          git commit -m "New order"
+          git push
